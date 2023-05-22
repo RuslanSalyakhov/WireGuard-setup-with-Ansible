@@ -85,7 +85,7 @@ Find PermitRootLogin and set it to no:
 ```bash
 PermitRootLogin no
 ```
-Find ChallengeResponseAuthentication and set it to no:
+Find ChallengeResponseAuthentication and check that it set to no:
 ```bash
 ChallengeResponseAuthentication no
 ```
