@@ -1,0 +1,72 @@
+---
+- name: Add new client to the WireGuard server
+  hosts: 127.0.0.1
+  tasks:
+
+    - name: Find number of the last public key
+      shell: ls /etc/wireguard/ | grep -Po 'client\K(\d*)(?=_public.key)' | sort -rn | head -n 1
+      register: number
+
+    - name: Print last public key number
+      debug:
+        msg: "{{ number.stdout }}"
+      #Since we have only 254 usable IP in the /24 subnet and 10.0.0.1 used by server and 10.0.0.2 by first client
+    - name: Failed when the last client number more than 253
+      fail:
+        msg: "Don't have any available IP in the current subnet 10.0.0.0"
+      when: number['stdout'] | int > 253
+
+    - name: Create client{{ number.stdout | int + 1 }}_public.key and client{{ number.stdout | int + 1 }}_private.key for a new client
+      shell: "wg genkey | tee /etc/wireguard/client{{ number['stdout'] | int + 1 }}_private.key | wg pubkey > /etc/wireguard/client{{ number['stdout'] | int + 1 }}_public.key"
+
+    - name: Set variable to keep path to client{{ number.stdout | int + 1 }}_public.key and client{{ number.stdout | int + 1 }}_private.key
+      set_fact:
+        public_path: /etc/wireguard/client{{ number.stdout | int + 1 }}_public.key
+        private_path: /etc/wireguard/client{{ number.stdout | int + 1 }}_private.key
+
+    - name: Add new client configuration to wg0.conf file
+      blockinfile:
+        path: /etc/wireguard/wg0.conf
+        block: |
+          [Peer]
+          PublicKey = {{ lookup('file', public_path) }}
+          AllowedIPs = 10.0.0.{{ number.stdout | int + 2 }}/32
+        marker: "# {mark} ANSIBLE MANAGED BLOCK for client{{ number.stdout | int + 1 }} configuration"
+      notify: Restart WireGuard
+
+    - name: Create client subdirectory for keeping clients conf files
+      file:
+        path: "{{ ansible_facts['env']['PWD'] }}/client{{ number.stdout | int + 1 }}"
+        state: directory
+        mode: '0750'
+
+    - name: Create config for client{{ number.stdout | int + 1 }} from template in the current directory
+      template:
+        src: wg_add_client.j2
+        dest: wg-client{{ number.stdout | int + 1 }}.conf
+        owner: root
+        group: root
+        mode: '0600'
+
+    - name: Generate QR code for wg-client{{ number.stdout | int + 1 }}.conf in the current directory
+      shell: "qrencode -t ansiutf8  < wg-client{{ number['stdout'] | int + 1 }}.conf"
+      changed_when: false
+      register: qr_code
+
+    - name: >
+        Save QR code to a file wg-client{{ number.stdout | int + 1 }}.utf8 in the current directory.
+        Use cat or vim to display it!
+      shell: "qrencode -t utf8 -o wg-client{{ number.stdout | int + 1 }}.utf8  < wg-client{{ number.stdout | int + 1 }}.conf"
+      changed_when: false
+
+    - name: Move conf files to client{{ number.stdout | int + 1 }} directory
+      shell: "mv {{ ansible_facts['env']['PWD'] }}/wg-client{{ number['stdout'] | int + 1 }}.* {{ ansible_facts['env']['PWD'] }}/client{{ number.stdout | int + 1 }}/"
+    - name: Print generated QR code
+      debug:
+        msg: "{{ qr_code.stdout_lines }}"
+
+  handlers:
+    - name: Restart WireGuard
+      service:
+        name: wg-quick@wg0
+        state: restarted

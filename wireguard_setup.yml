@@ -1,0 +1,130 @@
+---
+- name: Install WireGuard on CentOS 7
+  hosts: 127.0.0.1
+  tasks:
+    - name: Update all packages
+      yum:
+        name: '*'
+        state: latest
+      tags: updates
+
+    - name: Install required yum repositories
+      yum:
+        name:
+          - epel-release
+          - elrepo-release
+          - yum-plugin-elrepo
+        state: latest
+
+    - name: Install WireGuard, WireGuard tools, firewalld and qrencode
+      yum:
+        name:
+          - kmod-wireguard
+          - wireguard-tools
+          - firewalld
+          - qrencode
+        state: present
+
+    - name: Load wireguard kernel using modprobe
+      modprobe:
+        name: wireguard
+        state: present
+
+    # Check if public key has been already created by previous playbook run. If it is already created so private and public keys exist.
+    - name: Check if public key has been already created by previous playbook run
+      stat:
+        path: /etc/wireguard/public.key
+      register: stat_results
+      ignore_errors: true
+
+    - name: Create server public and private keys if they don't exist
+      shell: wg genkey | tee /etc/wireguard/private.key | wg pubkey > /etc/wireguard/public.key
+      when: stat_results.stat.exists == False
+
+    - name: Change permissions to 600 for the private.key
+      file:
+        path: /etc/wireguard/private.key
+        mode: '0600'
+
+    - name: Check if client public key has been already created by previous playbook run
+      stat:
+        path: /etc/wireguard/client1_public.key
+      register: client_results
+      ignore_errors: true
+
+    - name: Create client public and private keys if they don't exist
+      shell: wg genkey | tee /etc/wireguard/client1_private.key | wg pubkey > /etc/wireguard/client1_public.key
+      when: client_results.stat.exists == False
+
+    - name: Create wg0.conf file using wg0.j2 template including client public key and IP data
+      template:
+        src: wg0.j2
+        dest: /etc/wireguard/wg0.conf
+        owner: root
+        group: root
+        mode: '0600'
+      # If configuration changed restart WireGuard
+      notify: Restart WireGuard
+
+    - name: Enable and persist IP forwarding
+      sysctl:
+        name: net.ipv4.ip_forward
+        value: "1"
+        state: present
+        sysctl_set: yes
+        reload: yes
+
+    - name: Start and enable firewalld service
+      service:
+        name: firewalld
+        state: started
+        enabled: true
+
+    - name: Enable IP Masquerading for 10.0.0.0 subnet
+      firewalld:
+        rich_rule: rule family="ipv4" source address="10.0.0.0/24" masquerade
+        permanent: yes
+        immediate: yes
+        state: enabled
+
+    - name: Allow access WireGuard on firewalld
+      firewalld:
+        port: 51820/udp
+        permanent: true
+        state: enabled
+        immediate: yes
+
+    - name: Start WireGuard and enable on boot
+      systemd:
+        name: wg-quick@wg0
+        enabled: true
+        state: started
+
+    - name: Create wg_client1.conf file using wg0.j2 template
+      template:
+        src: wg_client.j2
+        dest: wg-client1.conf
+        owner: root
+        group: root
+        mode: '0600'
+
+    - name: Generate QR code for wg-client1.conf for access
+      shell: qrencode -t ansiutf8  < wg-client1.conf
+      changed_when: false
+      register: qr_code
+
+    - name: >
+        Save QR code to a file wg-client1.utf8 in the current directory.
+        Use cat or vim to display it!
+      shell: qrencode -t utf8 -o wg-client1.utf8  < wg-client1.conf
+      changed_when: false
+
+    - name: Print generated QR code
+      debug:
+        msg: "{{ qr_code.stdout_lines }}"
+
+  handlers:
+    - name: Restart WireGuard
+      service:
+        name: wg-quick@wg0
+        state: restarted
