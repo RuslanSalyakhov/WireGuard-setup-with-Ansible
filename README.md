@@ -85,6 +85,14 @@ Find PermitRootLogin and set it to no:
 ```bash
 PermitRootLogin no
 ```
+Find ChallengeResponseAuthentication and set it to no:
+```bash
+ChallengeResponseAuthentication no
+```
+Find UsePAM and set it to no:
+```bash
+UsePAM no
+```
 Reload sshd service to apply configuration changes:
 ```bash
 sudo systemctl reload sshd
