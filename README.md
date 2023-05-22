@@ -1,5 +1,6 @@
-# WireGuard-setup-with-Ansible
-### WireGuard automated installation using Ansible playbook. ###
+# WireGuard setup with Ansible
+
+## WireGuard automated installation using Ansible playbook. ##
 
 For OS Red Hat 7 or CentOS 7 platfrom-python has been already installed with OS. Command to check its status:
 ```bash
@@ -48,7 +49,25 @@ Playbook will use the subsequent numbers 2,3,4... for conf file naming and assig
 wg-client#.conf used for QR code generation also saved to the current directory. You can use this configuration for VPN client setup if QR is not suitable:
 ![image](https://github.com/RuslanSalyakhov/WireGuard-setup-with-Ansible/assets/45723128/f6d60a5f-f17a-4274-a13c-13aa4a387145)
 
-### Post Installation activities to secure server access via ssh  ###
+## Post Installation activities to secure server access via ssh  ##
+### Create wireguard user and ssh keys for authentication  ###
+Create wireguard user on the WireGuard server:
+```bash
+usermod -aG wheel wireguard
+```
+Generate ssh keys on a **Remote machine**:
+```bash
+ssh-keygen -t rsa
+```
+Copy generated public key from **Remote machine** to the WireGurard server:
+```bash
+ssh-copy-id -i ~/.ssh/id_rsa.pub wireguard@<WIREGUARD_SERVER_IP>
+```
+Connect to WireGuard server via ssh using public key copied earlier for authentication:
+```bash
+ssh wireguard@<WIREGUARD_SERVER_IP>
+```
+### Secure WireGuard server access via ssh   ###
 Edit /etc/ssh/sshd_config disabling password authentication and denying root user authentication to improve ssh security:
 ```bash
 sudo vi /etc/ssh/sshd_config
@@ -60,4 +79,8 @@ PasswordAuthentication no
 Find PermitRootLogin and set it to no:
 ```bash
 PermitRootLogin no
+```
+Reload sshd service to apply configuration changes:
+```bash
+sudo systemctl reload sshd
 ```
