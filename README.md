@@ -31,6 +31,11 @@ Create wireguard folder and change to it:
 mkdir wireguard
 cd wireguard/
 ```
+Install git and copy Ansible files from GitHub repository:
+```bash
+yum -y install git
+git clone https://github.com/RuslanSalyakhov/WireGuard-setup-with-Ansible.git ~/wireguard
+```
 Run playbook wireguard_setup.yml to setup WireGuard and create config for the first client:
 ```bash
 ansible-playbook wireguard_setup.yml
