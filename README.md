@@ -5,9 +5,13 @@ For OS Red Hat 7 or CentOS 7 platfrom-python has been already installed with OS.
 ```bash
 yum list installed platform-python
 ```
-Switch to root user: 
+Switch to root user if your current user included in the group from /etc/sudoers file or switch to root using **su -** command with root password : 
 ```bash
 sudo -i
+```
+OR
+```bash
+su -
 ```
 If the platform-python has not been installed earlier install python36 package:
 ```bash
@@ -45,11 +49,15 @@ wg-client#.conf used for QR code generation also saved to the current directory.
 ![image](https://github.com/RuslanSalyakhov/WireGuard-setup-with-Ansible/assets/45723128/f6d60a5f-f17a-4274-a13c-13aa4a387145)
 
 ### Post Installation activities to secure server access via ssh  ###
-Edis /etc/ssh/sshd_config disabling password authentication and denying root user authentication:
+Edit /etc/ssh/sshd_config disabling password authentication and denying root user authentication to improve ssh security:
 ```bash
 sudo vi /etc/ssh/sshd_config
 ```
-Find PasswordAuthentication and set to no:
+Find PasswordAuthentication and set it to no:
 ```bash
 PasswordAuthentication no
+```
+Find PermitRootLogin and set it to no:
+```bash
+PermitRootLogin no
 ```
