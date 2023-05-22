@@ -44,4 +44,12 @@ Playbook will use the subsequent numbers 2,3,4... for conf file naming and assig
 wg-client#.conf used for QR code generation also saved to the current directory. You can use this configuration for VPN client setup if QR is not suitable:
 ![image](https://github.com/RuslanSalyakhov/WireGuard-setup-with-Ansible/assets/45723128/f6d60a5f-f17a-4274-a13c-13aa4a387145)
 
-
+### Post Installation activities to secure server access via ssh  ###
+Edis /etc/ssh/sshd_config disabling password authentication and denying root user authentication:
+```bash
+sudo vi /etc/ssh/sshd_config
+```
+Find PasswordAuthentication and set to no:
+```bash
+PasswordAuthentication no
+```
