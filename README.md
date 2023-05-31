@@ -1,8 +1,8 @@
-# WireGuard setup with Ansible
+# WireGuard setup with Ansible on CentOS/RedHat 7 
 
 ## WireGuard automated installation using Ansible playbook. ##
 
-For OS Red Hat 7 or CentOS 7 platfrom-python has been already installed with OS. Command to check its status:
+For OS RedHat 8 or CentOS 8 platfrom-python has been already installed with OS. Command to check its status:
 ```bash
 yum list installed platform-python
 ```
@@ -55,7 +55,7 @@ wg-client#.conf used for QR code generation also saved to the current directory.
 ![playbook_2](https://github.com/RuslanSalyakhov/WireGuard-setup-with-Ansible/assets/45723128/b3a3b376-beab-41c8-9680-daa6ef642229)
 
 ## Post Installation activities to secure server access via ssh  ##
-### Create wireguard user and ssh keys for authentication  ###
+### Create wireguard user and ssh keys for authentication. ###
 Create wireguard user on the WireGuard server:
 ```bash
 usermod -aG wheel wireguard
@@ -72,7 +72,7 @@ Connect to WireGuard server via ssh using public key copied earlier for authenti
 ```bash
 ssh wireguard@<WIREGUARD_SERVER_IP>
 ```
-### Secure WireGuard server access via ssh   ###
+### Secure WireGuard server access via ssh. ###
 Edit /etc/ssh/sshd_config disabling password authentication and denying root user authentication to improve ssh security:
 ```bash
 sudo vi /etc/ssh/sshd_config
