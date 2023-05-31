@@ -43,7 +43,7 @@ ansible-playbook wireguard_setup.yml
 To connect the first VPN client use QR code printed on the screen. QR code additionally saved to wg-client1.utf8 can be read using cat or vim command.  
 wg-client1.conf used for QR code generation also saved to the current directory. You can use this configuration for VPN client setup if QR is not suitable:
 
-![image](https://github.com/RuslanSalyakhov/WireGuard-setup-with-Ansible/assets/45723128/51b86c34-94fc-40e2-a1a4-656db8047a5a)
+![playbook_1](https://github.com/RuslanSalyakhov/WireGuard-setup-with-Ansible/assets/45723128/caf01cc3-5e18-4308-b839-73f26db70bc8)
 
 ### Add new VPN client. ###
 Run playbook add_new_client.yml to add a new client to the VPN server and generate connection config:
@@ -52,7 +52,7 @@ ansible-playbook add_new_client.yml
 ```
 Playbook will use the subsequent numbers 2,3,4... for conf file naming and assign next IP address (10.0.0.3, 10.0.0.4...) to the vpn client.<br />To connect VPN client use QR code printed on the screen. QR code additionally saved to wg-client#.utf8 and can be read using cat or vim command.  
 wg-client#.conf used for QR code generation also saved to the current directory. You can use this configuration for VPN client setup if QR is not suitable:
-![image](https://github.com/RuslanSalyakhov/WireGuard-setup-with-Ansible/assets/45723128/f6d60a5f-f17a-4274-a13c-13aa4a387145)
+![playbook_2](https://github.com/RuslanSalyakhov/WireGuard-setup-with-Ansible/assets/45723128/b3a3b376-beab-41c8-9680-daa6ef642229)
 
 ## Post Installation activities to secure server access via ssh  ##
 ### Create wireguard user and ssh keys for authentication  ###
