@@ -61,11 +61,16 @@ Create wireguard user on the WireGuard server and adding this user to the wheel 
 useradd wireguard
 usermod -aG wheel wireguard
 ```
+Set wireguard user password:
+```bash
+echo my_new_password | passwd --stdin wireguard
+```
+
 Generate ssh keys on a **Remote machine**:
 ```bash
 ssh-keygen -t rsa
 ```
-Copy generated public key from **Remote machine** to the WireGurard server:
+Copy generated public key from **Remote machine** to the WireGurard server. To authenticate you need to enter wireguard user password:
 ```bash
 ssh-copy-id -i ~/.ssh/id_rsa.pub wireguard@<WIREGUARD_SERVER_IP>
 ```
