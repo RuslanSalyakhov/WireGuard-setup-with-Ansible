@@ -2,6 +2,11 @@
 
 ## WireGuard automated installation using Ansible playbook. ##
 
+Update all installed packages :
+```bash
+yum update -y
+```
+
 For OS RedHat 8 or CentOS 8 platfrom-python has been already installed with OS. Command to check its status:
 ```bash
 yum list installed platform-python
