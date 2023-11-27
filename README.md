@@ -56,8 +56,9 @@ wg-client#.conf used for QR code generation also saved to the current directory.
 
 ## Post Installation activities to secure server access via ssh  ##
 ### Create wireguard user and ssh keys for authentication. ###
-Create wireguard user on the WireGuard server:
+Create wireguard user on the WireGuard server and adding this user to the wheel group to get access to sudo:
 ```bash
+useradd wireguard
 usermod -aG wheel wireguard
 ```
 Generate ssh keys on a **Remote machine**:
