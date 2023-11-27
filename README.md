@@ -40,6 +40,10 @@ Run playbook wireguard_setup.yml to setup WireGuard and create config for the fi
 ```bash
 ansible-playbook wireguard_setup.yml
 ```
+OR if you want to skip updating all installed packages task:
+```bash
+ansible-playbook wireguard_setup.yml --skip-tags updates
+```
 To connect the first VPN client use QR code printed on the screen. QR code additionally saved to wg-client1.utf8 can be read using cat or vim command.  
 wg-client1.conf used for QR code generation also saved to the current directory. You can use this configuration for VPN client setup if QR is not suitable:
 
