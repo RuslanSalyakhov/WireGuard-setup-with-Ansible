@@ -13,6 +13,11 @@
         name:
           - epel-release
           - elrepo-release
+        state: latest
+
+    - name: Install yum-plugin-elrepo
+      yum:
+        name:
           - yum-plugin-elrepo
         state: latest
 
