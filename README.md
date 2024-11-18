@@ -114,11 +114,11 @@ sudo systemctl reload sshd
 ```
 
 ### Two way ping disabling. ###
-Turn off the ICMP requests
+Turn off the ICMP requests:
 ```bash
 sudo firewall-cmd --permanent --add-icmp-block=echo-request
 ```
-Apply updated config
+Apply updated config:
 ```bash
 sudo firewall-cmd --reload
 ```
